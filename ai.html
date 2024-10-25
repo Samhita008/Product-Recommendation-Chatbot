@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Recommendation Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        #chatbox {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+        }
+        #chatbox div {
+            margin: 5px 0;
+        }
+        .bot {
+            color: blue;
+        }
+        .user {
+            color: green;
+            text-align: right;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Product Recommendation Chatbot</h1>
+    <div id="chatbox">
+        <div class="bot">Bot: Hello! I can help you find the best tech products.</div>
+        <div class="bot">Bot: Type 'quit' to exit</div>
+    </div>
+    <input type="text" id="userInput" placeholder="Type your message here">
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+    // Store the product recommendations dictionary
+    const productRecommendations = {
+        'smartphone': {
+            'budget': ['Redmi Note series', 'Moto G Power'],
+            'photography': ['Google Pixel 6a', 'OnePlus Nord 2'],
+        },
+        'laptop': {
+            'programming': ['Dell XPS 13', 'MacBook Air M1'],
+            'video editing': ['MacBook Pro M1', 'Dell XPS 15'],
+            'student': ['Lenovo Yoga 7i', 'HP Spectre x360'],
+            'reliable': ['Lenovo ThinkPad', 'Apple MacBook']
+        },
+        'smartwatch': {
+            'fitness': ['Apple Watch Series 8', 'Fitbit Charge 5'],
+            'android': ['Samsung Galaxy Watch 6', 'Garmin Venu 2'],
+            'seniors': ['Apple Watch SE', 'Fitbit Sense']
+        },
+        'camera': {
+            'beginner': ['Canon EOS Rebel T7i', 'Nikon D3500'],
+            'wildlife': ['Nikon D850', 'Canon EOS 90D'],
+            'vlogging': ['Sony ZV-1', 'Canon EOS M50 Mark II'],
+            'action': ['GoPro Hero 11', 'DJI Osmo Action']
+        },
+        'headphones': {
+            'noise canceling': ['Sony WH-1000XM4', 'Bose QuietComfort 35 II'],
+            'gaming': ['SteelSeries Arctis 7', 'HyperX Cloud II Wireless'],
+            'true wireless': ['Sony WF-1000XM4', 'Apple AirPods Pro']
+        },
+        'tablet': {
+            'drawing': ['iPad Pro with Apple Pencil', 'Wacom Cintiq'],
+            'kids': ['Amazon Fire HD 10 Kids Edition', 'iPad Mini']
+         },
+        'monitor': {
+            'gaming': ['ASUS TUF Gaming VG289Q', 'LG 27GN950-B'],
+            '4K': ['TCL 6-Series', 'Vizio M-Series']
+        },
+        'soundbar': {
+            'budget': ['Vizio V-Series 2.1', 'TCL Alto 6+'],
+            'home theater': ['Sonos Arc', 'Samsung HW-Q950A']
+        },
+        'gaming_console': {
+            'playstation': ['PlayStation 5'],
+            'xbox': ['Xbox Series X']
+        },
+        'robot_vacuum': {
+            'pet_hair': ['iRobot Roomba i7+', 'Shark IQ Robot XL'],
+            'hardwood': ['iRobot Roomba s9+', 'Eufy RoboVac 11S']
+        },
+        'drone': {
+            'budget': ['DJI Mini 2', 'Ryze Tello']
+        },
+        'projector': {
+            'portable': ['Anker Nebula Capsule', 'ViewSonic M1 Mini']
+        },
+        'external_hard_drive': {
+            'reliable': ['Seagate Backup Plus', 'Western Digital My Passport']
+        },
+        'gaming_mouse': {
+            'budget': ['Logitech G203', 'Razer DeathAdder Essential']
+        },
+        'keyboard': {
+            'ergonomic': ['Logitech Ergo K860', 'Microsoft Sculpt Ergonomic'],
+            'mechanical': ['Razer Huntsman Elite', 'Corsair K95 RGB Platinum']
+        },
+        'microphone': {
+            'streaming': ['Blue Yeti', 'Elgato Wave:3']
+        },
+        'power_bank': {
+            'fast_charging': ['Anker PowerCore 10000 PD', 'RAVPower Portable Charger']
+        },
+        'thermostat': {
+            'energy_savings': ['Google Nest Learning Thermostat', 'Ecobee SmartThermostat']
+        },
+        'fitness_tracker': {
+            'swimming': ['Garmin Swim 2', 'Fitbit Charge 5']
+        },
+        'electric_scooter': {
+            'commuting': ['Xiaomi Mi Electric Scooter', 'Segway Ninebot Max']
+        },
+        'gaming_chair': {
+            'budget': ['GTRACING Gaming Chair', 'RESPAWN 110']
+        },
+        'wireless_speaker': {
+            'good_bass': ['JBL Charge 5', 'Ultimate Ears Boom 3']
+        }
+    };
+
+    // Function to get recommendations based on user input
+    function getRecommendation(userInput) {
+        // Convert spaces to underscores
+        userInput = userInput.toLowerCase().replace(/\s+/g, '_');
+        
+        for (const category in productRecommendations) {
+            if (userInput.includes(category)) {
+                const requirements = productRecommendations[category];
+                for (const requirement in requirements) {
+                    if (userInput.includes(requirement)) {
+                        return `For ${category} with ${requirement} requirements, I recommend: ${requirements[requirement].join(', ')}`;
+                    }
+                }
+            }
+        }
+        return "I'm sorry, I couldn't find a specific recommendation. Please ask about specific products like smartphones, laptops, smartwatches, cameras, or headphones, and include requirements like 'budget', 'gaming', etc.";
+    }
+
+    // Function to handle sending the message
+    function sendMessage() {
+        const userInput = document.getElementById("userInput").value;
+        if (userInput === '') return; // Prevent sending empty input
+        
+        const chatbox = document.getElementById("chatbox");
+
+        // Append user's message to chat
+        const userMessage = document.createElement('div');
+        userMessage.className = 'user';
+        userMessage.textContent = `You: ${userInput}`;
+        chatbox.appendChild(userMessage);
+
+        // Scroll to the bottom of the chatbox
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        // Get bot's response
+        let botResponse = '';
+        if (userInput.toLowerCase() === 'quit') {
+            botResponse = 'Goodbye! Have a great day!';
+        } else {
+            botResponse = getRecommendation(userInput);
+        }
+
+        // Append bot's message to chat
+        const botMessage = document.createElement('div');
+        botMessage.className = 'bot';
+        botMessage.textContent = `Bot: ${botResponse}`;
+        chatbox.appendChild(botMessage);
+
+        // Scroll to the bottom of the chatbox
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        // Clear the input field
+        document.getElementById("userInput").value = '';
+    }
+</script>
+
+</body>
+</html>
