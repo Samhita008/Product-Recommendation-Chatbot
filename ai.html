@@ -5,59 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Recommendation Chatbot</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 400px;
-            margin: 100px auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-        }
-        #chatbox {
-            height: 300px;
-            overflow-y: auto;
-            padding: 10px;
-            border: 1px solid #ccc;
-            background-color: #f9f9f9;
-            margin-bottom: 10px;
-        }
-        #chatbox div {
-            margin: 5px 0;
-        }
-        .bot {
-            color: blue;
-        }
-        .user {
-            color: green;
-            text-align: right;
-        }
-        input[type="text"] {
-            width: 80%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-right: 5px;
-        }
-        button {
-            padding: 10px;
-            border: none;
-            background-color: #28a745;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-    </style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #d3d3d3, #a9a9a9); /* Subtle gradient background */
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        width: 450px;
+        background: #f0f0f0; /* Light gray background for the chat container */
+        border-radius: 15px;
+        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1); /* Soft shadow for the container */
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 600px;
+    }
+
+    h1 {
+        text-align: center;
+        background: #000000; /* Black header background */
+        color: white; /* White text for the header */
+        margin: 0;
+        padding: 20px;
+        font-size: 1.5rem; /* Adjusted font size for better readability */
+    }
+
+    #chatbox {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+        background: #e0e0e0; /* Neutral light gray background for the chat area */
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* Space between messages */
+    }
+
+    #chatbox .bot,
+    #chatbox .user {
+        max-width: 80%; /* Limit message width to 80% of the chat area */
+        padding: 10px;
+        border-radius: 10px;
+        font-size: 0.9rem; /* Slightly smaller font for messages */
+    }
+
+    .bot {
+        background-color: #e8e8e8; /* Light gray for bot messages */
+        color: #333333; /* Dark gray text for bot messages */
+        align-self: flex-start; /* Align bot messages to the left */
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for messages */
+    }
+
+    .user {
+        background-color: #d6d6d6; /* Neutral gray for user messages */
+        color: #000000; /* Black text for user messages */
+        align-self: flex-end; /* Align user messages to the right */
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for messages */
+    }
+
+    .input-area {
+        display: flex;
+        background-color: #ffffff; /* White background for the input area */
+        border-top: 1px solid #ccc; /* Light gray border on top */
+        gap: 10px; /* Space between input and button */
+        padding: 0;
+    }
+
+    input[type="text"] {
+        flex: 1; /* Make the input field take up available space */
+        padding: 12px;
+        border: none;
+        font-size: 1rem; /* Regular font size for input */
+        outline: none; /* Remove focus outline */
+        border-radius: 0;
+    }
+
+    button {
+        background: #000000; /* Black background for the send button */
+        color: white; /* White text for the button */
+        border: none;
+        padding: 12px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.3s ease; /* Smooth hover effect */
+        border-radius: 0;
+    }
+
+    button:hover {
+        background: #333333; /* Slightly lighter black for hover state */
+    }
+</style>
 </head>
 <body>
 
@@ -67,103 +109,194 @@
         <div class="bot">Bot: Hello! I can help you find the best tech products.</div>
         <div class="bot">Bot: Type 'quit' to exit</div>
     </div>
-    <input type="text" id="userInput" placeholder="Type your message here">
-    <button onclick="sendMessage()">Send</button>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Type your message here">
+        <button onclick="sendMessage()">Send</button>
+    </div>
 </div>
 
 <script>
-    // Store the product recommendations dictionary
-    const productRecommendations = {
-        'smartphone': {
-            'budget': ['Redmi Note series', 'Moto G Power'],
-            'photography': ['Google Pixel 6a', 'OnePlus Nord 2'],
-        },
-        'laptop': {
-            'programming': ['Dell XPS 13', 'MacBook Air M1'],
-            'video editing': ['MacBook Pro M1', 'Dell XPS 15'],
-            'student': ['Lenovo Yoga 7i', 'HP Spectre x360'],
-            'reliable': ['Lenovo ThinkPad', 'Apple MacBook']
-        },
-        'smartwatch': {
-            'fitness': ['Apple Watch Series 8', 'Fitbit Charge 5'],
-            'android': ['Samsung Galaxy Watch 6', 'Garmin Venu 2'],
-            'seniors': ['Apple Watch SE', 'Fitbit Sense']
-        },
-        'camera': {
-            'beginner': ['Canon EOS Rebel T7i', 'Nikon D3500'],
-            'wildlife': ['Nikon D850', 'Canon EOS 90D'],
-            'vlogging': ['Sony ZV-1', 'Canon EOS M50 Mark II'],
-            'action': ['GoPro Hero 11', 'DJI Osmo Action']
-        },
-        'headphones': {
-            'noise canceling': ['Sony WH-1000XM4', 'Bose QuietComfort 35 II'],
-            'gaming': ['SteelSeries Arctis 7', 'HyperX Cloud II Wireless'],
-            'true wireless': ['Sony WF-1000XM4', 'Apple AirPods Pro']
-        },
-        'tablet': {
-            'drawing': ['iPad Pro with Apple Pencil', 'Wacom Cintiq'],
-            'kids': ['Amazon Fire HD 10 Kids Edition', 'iPad Mini']
-         },
-        'monitor': {
-            'gaming': ['ASUS TUF Gaming VG289Q', 'LG 27GN950-B'],
-            '4K': ['TCL 6-Series', 'Vizio M-Series']
-        },
-        'soundbar': {
-            'budget': ['Vizio V-Series 2.1', 'TCL Alto 6+'],
-            'home theater': ['Sonos Arc', 'Samsung HW-Q950A']
-        },
-        'gaming_console': {
-            'playstation': ['PlayStation 5'],
-            'xbox': ['Xbox Series X']
-        },
-        'robot_vacuum': {
-            'pet_hair': ['iRobot Roomba i7+', 'Shark IQ Robot XL'],
-            'hardwood': ['iRobot Roomba s9+', 'Eufy RoboVac 11S']
-        },
-        'drone': {
-            'budget': ['DJI Mini 2', 'Ryze Tello']
-        },
-        'projector': {
-            'portable': ['Anker Nebula Capsule', 'ViewSonic M1 Mini']
-        },
-        'external_hard_drive': {
-            'reliable': ['Seagate Backup Plus', 'Western Digital My Passport']
-        },
-        'gaming_mouse': {
-            'budget': ['Logitech G203', 'Razer DeathAdder Essential']
-        },
-        'keyboard': {
-            'ergonomic': ['Logitech Ergo K860', 'Microsoft Sculpt Ergonomic'],
-            'mechanical': ['Razer Huntsman Elite', 'Corsair K95 RGB Platinum']
-        },
-        'microphone': {
-            'streaming': ['Blue Yeti', 'Elgato Wave:3']
-        },
-        'power_bank': {
-            'fast_charging': ['Anker PowerCore 10000 PD', 'RAVPower Portable Charger']
-        },
-        'thermostat': {
-            'energy_savings': ['Google Nest Learning Thermostat', 'Ecobee SmartThermostat']
-        },
-        'fitness_tracker': {
-            'swimming': ['Garmin Swim 2', 'Fitbit Charge 5']
-        },
-        'electric_scooter': {
-            'commuting': ['Xiaomi Mi Electric Scooter', 'Segway Ninebot Max']
-        },
-        'gaming_chair': {
-            'budget': ['GTRACING Gaming Chair', 'RESPAWN 110']
-        },
-        'wireless_speaker': {
-            'good_bass': ['JBL Charge 5', 'Ultimate Ears Boom 3']
-        }
-    };
+    const productRecommendations = {  
+    'smartphone': {  
+        'gaming': ['ASUS ROG Phone 7', 'Poco F4 GT'],  
+        'budget': ['Redmi Note series', 'Moto G Power'],  
+        'photography': ['Google Pixel 6a', 'OnePlus Nord 2'],  
+        'long battery': ['Samsung Galaxy M14', 'Realme Narzo 60'],  
+        '5G': ['OnePlus Nord CE 3 Lite', 'Samsung Galaxy A14 5G']  
+    },  
+    'laptop': {  
+        'programming': ['Dell XPS 13', 'MacBook Air M1'],  
+        'video editing': ['MacBook Pro M1', 'Dell XPS 15'],  
+        'student': ['Lenovo Yoga 7i', 'HP Spectre x360'],  
+        'gaming': ['ASUS ROG Zephyrus G14', 'Alienware m15 R7'],  
+        'budget': ['Acer Aspire 5', 'HP Pavilion 15']  
+    },  
+    'smartwatch': {  
+        'fitness': ['Apple Watch Series 8', 'Fitbit Charge 5'],  
+        'android': ['Samsung Galaxy Watch 6', 'Garmin Venu 2'],  
+        'seniors': ['Apple Watch SE', 'Fitbit Sense'],  
+        'rugged': ['Garmin Fenix 7', 'Suunto 9 Peak'],  
+        'budget': ['Amazfit Bip U Pro', 'Realme Watch 2']  
+    },  
+    'camera': {  
+        'beginner': ['Canon EOS Rebel T7i', 'Nikon D3500'],  
+        'wildlife': ['Nikon D850', 'Canon EOS 90D'],  
+        'vlogging': ['Sony ZV-1', 'Canon EOS M50 Mark II'],  
+        'action': ['GoPro Hero 11', 'DJI Osmo Action'],  
+        'travel': ['Sony RX100 VII', 'Panasonic Lumix LX100 II']  
+    },  
+    'headphones': {  
+        'noise canceling': ['Sony WH-1000XM4', 'Bose QuietComfort 35 II'],  
+        'gaming': ['SteelSeries Arctis 7', 'HyperX Cloud II Wireless'],  
+        'true wireless': ['Sony WF-1000XM4', 'Apple AirPods Pro'],  
+        'budget': ['JBL Tune 760NC', 'Anker Soundcore Q20'],  
+        'bass': ['Skullcandy Crusher Evo', 'Sony XB950N1']  
+    },  
+    'tablet': {  
+        'drawing': ['iPad Pro with Apple Pencil', 'Wacom Cintiq'],  
+        'kids': ['Amazon Fire HD 10 Kids Edition', 'iPad Mini'],  
+        'budget': ['Samsung Galaxy Tab A8', 'Lenovo Tab M10'],  
+        'business': ['Microsoft Surface Pro 8', 'Lenovo ThinkPad X12'],  
+        'gaming': ['iPad Air 5', 'Samsung Galaxy Tab S8 Ultra']  
+    },  
+    'monitor': {  
+        'gaming': ['ASUS TUF Gaming VG289Q', 'LG 27GN950-B'],  
+        '4K': ['Dell UltraSharp U2723QE', 'LG 32UN880-B'],  
+        'budget': ['Acer Nitro VG240Y', 'HP 24mh'],  
+        'curved': ['Samsung Odyssey G7', 'MSI Optix MAG342CQR'],  
+        'office': ['ViewSonic VP2768a', 'BenQ PD2700U']  
+    },  
+    'soundbar': {  
+        'budget': ['Vizio V-Series 2.1', 'TCL Alto 6+'],  
+        'home theater': ['Sonos Arc', 'Samsung HW-Q950A'],  
+        'compact': ['Bose Solo 5', 'Sony HT-S200F'],  
+        'dolby atmos': ['LG SP9YA', 'Sony HT-A7000'],  
+        'portable': ['JBL Bar 2.0', 'Anker Soundcore Infini Pro']  
+    },  
+    'gaming_console': {  
+        'playstation': ['PlayStation 5'],  
+        'xbox': ['Xbox Series X'],  
+        'portable': ['Nintendo Switch OLED', 'Steam Deck'],  
+        'budget': ['Xbox Series S', 'PlayStation 4 Slim'],  
+        'retro': ['Sega Genesis Mini', 'SNES Classic Edition']  
+    },  
+    'robot_vacuum': {  
+        'pet_hair': ['iRobot Roomba i7+', 'Shark IQ Robot XL'],  
+        'hardwood': ['iRobot Roomba s9+', 'Eufy RoboVac 11S'],  
+        'mopping': ['Roborock S7', 'Bissell SpinWave'],  
+        'budget': ['Ecovacs DEEBOT N79W', 'ILIFE V3s Pro'],  
+        'silent': ['Neato D8', 'iRobot Roomba j7+']  
+    },  
+    'drone': {  
+        'budget': ['DJI Mini 2', 'Ryze Tello'],  
+        'professional': ['DJI Mavic 3', 'Autel Robotics EVO Lite+'],  
+        'racing': ['EMAX Tinyhawk 2', 'BETAFPV Beta95X V3'],  
+        'camera': ['DJI Air 2S', 'Parrot Anafi'],  
+        'kids': ['Holy Stone HS210', 'Snaptain H823H']  
+    },  
+    'projector': {  
+        'portable': ['Anker Nebula Capsule', 'ViewSonic M1 Mini'],  
+        '4K': ['Epson Home Cinema 5050UB', 'Optoma UHD50X'],  
+        'short throw': ['BenQ HT2150ST', 'Optoma GT1080HDR'],  
+        'budget': ['Vankyo Leisure 3', 'YABER Y31'],  
+        'home theater': ['Sony VPL-VW295ES', 'LG CineBeam HU85LA']  
+    },  
+    'external_hard_drive': {  
+        'reliable': ['Seagate Backup Plus', 'Western Digital My Passport'],  
+        'portable': ['Samsung T7', 'SanDisk Extreme Portable SSD'],  
+        'gaming': ['WD Black P10', 'Seagate FireCuda Gaming SSD'],  
+        'budget': ['Toshiba Canvio Basics', 'ADATA HD710'],  
+        'large capacity': ['LaCie d2 Professional', 'WD Elements Desktop']  
+    },  
+    'gaming_mouse': {  
+        'budget': ['Logitech G203', 'Razer DeathAdder Essential'],  
+        'wireless': ['Logitech G Pro X Superlight', 'Razer Viper Ultimate'],  
+        'FPS': ['SteelSeries Rival 310', 'Corsair M65 Elite'],  
+        'MOBA': ['Razer Naga X', 'Logitech G600'],  
+        'ergonomic': ['Roccat Kone Pro Air', 'Zowie EC2-A']  
+    },  
+    'keyboard': {  
+        'ergonomic': ['Logitech Ergo K860', 'Microsoft Sculpt Ergonomic'],  
+        'mechanical': ['Razer Huntsman Elite', 'Corsair K95 RGB Platinum'],  
+        'wireless': ['Logitech MX Keys', 'Keychron K6'],  
+        'RGB': ['SteelSeries Apex Pro', 'HyperX Alloy Origins Core'],  
+        'budget': ['Redragon K552', 'Cooler Master CK552']  
+    },  
+  'power_bank': {
+        'high capacity': ['Anker PowerCore 26800', 'RAVPower 30000mAh'],
+        'portable': ['Mi 10000mAh Power Bank 3i', 'Samsung Wireless Power Bank'],
+        'fast charging': ['Zendure SuperTank Pro', 'Belkin Boost Charge'],
+        'solar': ['Blavor Solar Charger Power Bank', 'Anker PowerCore Solar 20000'],
+        'budget': ['Realme Power Bank 2', 'Syska Power Core 100']
+    },
+    'printer': {
+        'inkjet': ['Canon PIXMA G6020', 'HP Smart Tank Plus 651'],
+        'laser': ['Brother HL-L2350DW', 'HP LaserJet Pro MFP M428fdw'],
+        'photo': ['Epson Expression Photo XP-970', 'Canon Selphy CP1300'],
+        'portable': ['HP Sprocket Select', 'Epson WorkForce WF-110'],
+        'budget': ['Brother HL-L2300D', 'Canon PIXMA MG3620']
+    },
+    'streaming_device': {
+        '4K': ['Apple TV 4K', 'NVIDIA Shield TV Pro'],
+        'budget': ['Amazon Fire TV Stick Lite', 'Roku Express 4K+'],
+        'gaming': ['Xbox Series X as streaming device', 'PlayStation 5'],
+        'portable': ['Google Chromecast', 'Roku Streaming Stick 4K'],
+        'best apps': ['Apple TV (tvOS integration)', 'NVIDIA Shield TV Pro']
+    },
+    'router': {
+        'Wi-Fi 6': ['ASUS RT-AX86U', 'Netgear Nighthawk AX12'],
+        'gaming': ['TP-Link Archer GX90', 'Netgear Nighthawk Pro XR500'],
+        'mesh': ['Google Nest WiFi', 'Eero 6+'],
+        'budget': ['TP-Link Archer A6', 'Netgear R6350'],
+        'high speed': ['ASUS ROG Rapture GT-AX11000', 'TP-Link AX90']
+    },
+    'SSD': {
+        'portable': ['Samsung T7 Shield', 'SanDisk Extreme Pro Portable'],
+        'gaming': ['WD Black SN850X', 'Samsung 990 Pro'],
+        'budget': ['Crucial MX500', 'Kingston A400'],
+        'large capacity': ['Seagate FireCuda 530', 'Samsung 870 QVO'],
+        'fastest': ['Corsair MP600 Pro XT', 'Kingston KC3000']
+    },
+    'electric_scooter': {
+        'long range': ['Segway Ninebot Max G30', 'Xiaomi Mi Scooter Pro 2'],
+        'budget': ['Hiboy S2 Lite', 'Gotrax GXL V2'],
+        'off-road': ['Kaabo Wolf Warrior 11', 'Dualtron Thunder 2'],
+        'lightweight': ['Unagi Model One', 'TurboAnt X7 Pro'],
+        'fast charging': ['Segway SuperScooter GT1', 'Apollo Phantom']
+    },
+    'smart_home_hub': {
+        'voice assistant': ['Amazon Echo Show 10', 'Google Nest Hub Max'],
+        'budget': ['Amazon Echo Dot', 'Google Nest Mini'],
+        'high compatibility': ['Apple HomePod Mini', 'Samsung SmartThings Hub'],
+        'security': ['Ring Alarm Pro', 'Aqara Hub E1'],
+        'best for automation': ['Hubitat Elevation', 'Home Assistant']
+    },
+    'fitness_tracker': {
+        'swimming': ['Garmin Swim 2', 'Fitbit Charge 5'],
+        'cycling': ['Garmin Edge 530', 'Wahoo ELEMNT Bolt'],
+        'running': ['Polar Vantage V2', 'Garmin Forerunner 255'],
+        'budget': ['Xiaomi Mi Smart Band 6', 'Honor Band 6'],
+        'advanced metrics': ['Whoop Strap 4.0', 'Garmin Fenix 7']
+    },
+    '3D_printer': {
+        'beginners': ['Creality Ender 3 V2', 'Anycubic i3 Mega'],
+        'professional': ['Prusa i3 MK3S+', 'Ultimaker S3'],
+        'large format': ['Creality CR-10', 'Artillery Sidewinder X1'],
+        'resin': ['Elegoo Mars 3', 'Anycubic Photon Mono X'],
+        'budget': ['Voxelab Aquila', 'Flashforge Finder']
+    },
+    'graphics_card': {
+        'gaming': ['NVIDIA GeForce RTX 4090', 'AMD Radeon RX 7900 XT'],
+        'budget': ['NVIDIA GTX 1650 Super', 'AMD RX 6600'],
+        'creative': ['NVIDIA RTX A2000', 'AMD Radeon Pro W5700'],
+        'high-end': ['NVIDIA GeForce RTX 4080', 'AMD Radeon RX 7900 XTX'],
+        'compact': ['Zotac GeForce GTX 1660 Super Mini', 'MSI GeForce RTX 3060 Aero']
+    }
+};
 
     // Function to get recommendations based on user input
     function getRecommendation(userInput) {
-        // Convert spaces to underscores
         userInput = userInput.toLowerCase().replace(/\s+/g, '_');
-        
         for (const category in productRecommendations) {
             if (userInput.includes(category)) {
                 const requirements = productRecommendations[category];
@@ -180,8 +313,8 @@
     // Function to handle sending the message
     function sendMessage() {
         const userInput = document.getElementById("userInput").value;
-        if (userInput === '') return; // Prevent sending empty input
-        
+        if (userInput === '') return;
+
         const chatbox = document.getElementById("chatbox");
 
         // Append user's message to chat
@@ -213,6 +346,8 @@
         // Clear the input field
         document.getElementById("userInput").value = '';
     }
+
+    
 </script>
 
 </body>
